@@ -34,21 +34,6 @@ define Package/wireshark
   TITLE:=Network monitoring and data  tool
 endef
 
-define Build/PrepareLemon
-	$(RM) -r $(PKG_BUILD_DIR)/tools/lemon/build
-	$(INSTALL_DIR) $(PKG_BUILD_DIR)/tools/lemon/build
-	cmake -S $(PKG_BUILD_DIR)/tools/lemon -B $(PKG_BUILD_DIR)/tools/lemon/build
-	$(MAKE) -C $(PKG_BUILD_DIR)/tools/lemon/build
-
-	$(INSTALL_DIR) $(STAGING_DIR_HOST)/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/lemon/build/lemon $(STAGING_DIR_HOST)/bin/
-
-	$(INSTALL_DIR) $(STAGING_DIR_HOST)/usr/share/lemon
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/tools/lemon/*.c $(STAGING_DIR_HOST)/usr/share/lemon/
-endef
-
-
-
 CMAKE_OPTIONS+= \
 -Dbuild_as_dynamic=ON \
 -DBUILD_wireshark=OFF \
@@ -79,13 +64,10 @@ CMAKE_OPTIONS+= \
 -DENABLE_NGHTTP3=OFF \
 -DBUILD_sharkd=OFF \
 -DBUILD_mmdbresolve=OFF \
--DSTAGING_DIR_HOST=$(STAGING_DIR_HOST)
+-DLEMON_C_COMPILER=$(HOSTCC) 
 
 CMAKE_HOST_OPTIONS:=-Dbuild_as_dynamic=ON
 
-define Build/Compile
-	$(call Build/PrepareLemon)
-endef
 
 define Package/wireshark/install
 	$(INSTALL_DIR) $(1)/usr/bin
