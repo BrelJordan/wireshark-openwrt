@@ -18,6 +18,8 @@ PKG_SOURCE_URL:=https://www.wireshark.org/download/src/
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=COPYING
 
+PGK_MAINTAINER=Jordan Ngako <jordan.ngako@mc-technologies.com>
+
 PKG_FIXUP:=autoreconf
 
 CMAKE_INSTALL:=1
@@ -27,18 +29,24 @@ include $(INCLUDE_DIR)/cmake.mk
 define Package/wireshark
   SECTION:=net
   CATEGORY:=Network
-  DEPENDS:=+librt +libcap +glib2 +tcpdump +libc +zlib +libgcrypt +libcares +liblua
+  DEPENDS:=+librt +libcap +glib2 +tcpdump +libc +zlib +libgcrypt +libcares +liblua +liblz4 +libgnutls libxml2
   URL:=http://www.wireshark.org/
   TITLE:=Network monitoring and data  tool
 endef
 
 define Build/PrepareLemon
-	$(RM) -r $(PKG_BUILD_DIR)/tools/lemon/build 
-	mkdir -p $(PKG_BUILD_DIR)/tools/lemon/build
+	$(RM) -r $(PKG_BUILD_DIR)/tools/lemon/build
+	$(INSTALL_DIR) $(PKG_BUILD_DIR)/tools/lemon/build
 	cmake -S $(PKG_BUILD_DIR)/tools/lemon -B $(PKG_BUILD_DIR)/tools/lemon/build
 	$(MAKE) -C $(PKG_BUILD_DIR)/tools/lemon/build
-	$(CP) $(PKG_BUILD_DIR)/tools/lemon/build/lemon $(STAGING_DIR_HOST)/bin/
+
+	$(INSTALL_DIR) $(STAGING_DIR_HOST)/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tools/lemon/build/lemon $(STAGING_DIR_HOST)/bin/
+
+	$(INSTALL_DIR) $(STAGING_DIR_HOST)/usr/share/lemon
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/tools/lemon/*.c $(STAGING_DIR_HOST)/usr/share/lemon/
 endef
+
 
 
 CMAKE_OPTIONS+= \
@@ -70,11 +78,12 @@ CMAKE_OPTIONS+= \
 -DENABLE_NGHTTP2=OFF \
 -DENABLE_NGHTTP3=OFF \
 -DBUILD_sharkd=OFF \
--DBUILD_mmdbresolve=OFF
+-DBUILD_mmdbresolve=OFF \
+-DSTAGING_DIR_HOST=$(STAGING_DIR_HOST)
 
 CMAKE_HOST_OPTIONS:=-Dbuild_as_dynamic=ON
 
-define Build/compile
+define Build/Compile
 	$(call Build/PrepareLemon)
 endef
 

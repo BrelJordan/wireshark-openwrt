@@ -1,0 +1,25 @@
+From db200633b7ae784ab103f9ba1c461fd67f3e15a0 Mon Sep 17 00:00:00 2001
+From: Jordan Ngako <ngako@mc-technologies.net>
+Date: Mon, 31 Mar 2025 13:38:02 +0200
+Subject: [PATCH] Use Lemon binary from build system
+
+---
+ cmake/modules/UseLemon.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/modules/UseLemon.cmake b/cmake/modules/UseLemon.cmake
+index 793cd2c..c19a23b 100644
+--- a/cmake/modules/UseLemon.cmake
++++ b/cmake/modules/UseLemon.cmake
+@@ -12,7 +12,7 @@ if(LEMON_EXECUTABLE)
+ 				${_out}.h
+ 				${_out}.out
+ 			COMMAND ${LEMON_EXECUTABLE}
+-				-T/usr/share/lemon/lempar.c
++				-T${STAGING_DIR_HOST}/usr/share/lemon/lempar.c
+ 				-d.
+ 				${_in}
+ 			DEPENDS
+-- 
+2.34.1
+
